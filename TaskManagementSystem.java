@@ -1,7 +1,7 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
+import java.io.PrintWriter;
 
 public class TaskManagementSystem {
     private static List<Task> tasks = new ArrayList<>();
@@ -41,11 +41,14 @@ public class TaskManagementSystem {
                     viewStatistics();
                     break;
                 case 8:
+                    exportTasksToCSV();
+                    break;
+                case 9:
                     running = false;
-                    System.out.println("\n✓ Thank you for using Task Management System!");
+                    System.out.println("\nThank you for using Task Management System!");
                     break;
                 default:
-                    System.out.println("\n✗ Invalid choice. Please try again.\n");
+                    System.out.println("\nInvalid choice. Please try again.\n");
             }
         }
         scanner.close();
@@ -63,7 +66,8 @@ public class TaskManagementSystem {
         System.out.println("5. Delete Task");
         System.out.println("6. Search Tasks");
         System.out.println("7. View Statistics");
-        System.out.println("8. Exit");
+        System.out.println("8. Export Tasks to CSV");
+        System.out.println("9. Exit");
         System.out.println("========================================");
     }
 
@@ -94,7 +98,7 @@ public class TaskManagementSystem {
         Task task = new Task(nextId++, title, description, dueDate, priority);
         tasks.add(task);
 
-        System.out.println("\n✓ Task added successfully!\n");
+        System.out.println("\nTask added successfully!\n");
     }
 
     /**
@@ -153,9 +157,9 @@ public class TaskManagementSystem {
 
         if (task != null) {
             task.markComplete();
-            System.out.println("\n✓ Task marked as complete!\n");
+            System.out.println("\nTask marked as complete!\n");
         } else {
-            System.out.println("\n✗ Task not found.\n");
+            System.out.println("\nTask not found.\n");
         }
     }
 
@@ -171,9 +175,9 @@ public class TaskManagementSystem {
 
         if (task != null) {
             tasks.remove(task);
-            System.out.println("\n✓ Task deleted successfully!\n");
+            System.out.println("\nTask deleted successfully!\n");
         } else {
-            System.out.println("\n✗ Task not found.\n");
+            System.out.println("\nTask not found.\n");
         }
     }
 
@@ -252,6 +256,61 @@ public class TaskManagementSystem {
     }
 
     /**
+     * Exports all tasks to a CSV file
+     */
+    private static void exportTasksToCSV() {
+        System.out.println("\n--- Export Tasks to CSV ---");
+        
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks to export.\n");
+            return;
+        }
+        
+        String filename = "tasks_export_" + LocalDate.now() + ".csv";
+        
+        try (PrintWriter writer = new PrintWriter(filename)) {
+            // Write CSV header
+            writer.println("ID,Title,Description,Due Date,Priority,Status,Created Date");
+            
+            // Write task data
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            for (Task task : tasks) {
+                String status = task.isCompleted() ? "COMPLETED" : "PENDING";
+                
+                // Escape commas and quotes in text fields
+                String title = escapeCSV(task.getTitle());
+                String description = escapeCSV(task.getDescription());
+                
+                writer.printf("\"%d\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
+                    task.getId(),
+                    title,
+                    description,
+                    task.getDueDate().format(formatter),
+                    task.getPriority(),
+                    status,
+                    task.getCreatedDate().format(formatter)
+                );
+            }
+            
+            System.out.println("\nTasks exported successfully!");
+            System.out.println("File: " + filename);
+            System.out.println("Total tasks exported: " + tasks.size() + "\n");
+            
+        } catch (Exception e) {
+            System.out.println("\nError exporting tasks: " + e.getMessage() + "\n");
+        }
+    }
+
+    /**
+     * Escapes special characters for CSV format
+     */
+    private static String escapeCSV(String value) {
+        if (value == null) return "";
+        // Replace quotes with double quotes
+        return value.replace("\"", "\"\"");
+    }
+
+    /**
      * Finds a task by its ID
      */
     private static Task findTaskById(int id) {
@@ -322,11 +381,12 @@ class Task {
     public LocalDate getDueDate() { return dueDate; }
     public Priority getPriority() { return priority; }
     public boolean isCompleted() { return completed; }
+    public LocalDate getCreatedDate() { return createdDate; }
 
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String status = completed ? "✓ COMPLETED" : "⏳ PENDING";
+        String status = completed ? "[COMPLETED]" : "[PENDING]";
         
         return String.format(
             "ID: %d\n" +

@@ -1,11 +1,8 @@
-import java.util.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 
-/**
- * Main class for Task Management System
- * Allows users to create, manage, and track tasks
- */
+
 public class TaskManagementSystem {
     private static List<Task> tasks = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);

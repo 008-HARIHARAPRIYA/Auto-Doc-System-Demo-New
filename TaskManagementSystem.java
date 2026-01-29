@@ -10,7 +10,7 @@ public class TaskManagementSystem {
 
     public static void main(String[] args) {
         System.out.println("========================================");
-        System.out.println("   TASK MANAGEMENT SYSTEM");
+        System.out.println("   TASK MANAGEMENT");
         System.out.println("========================================\n");
 
         boolean running = true;

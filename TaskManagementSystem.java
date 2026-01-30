@@ -1,7 +1,6 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.io.PrintWriter;
 
 public class TaskManagementSystem {
     private static List<Task> tasks = new ArrayList<>();
@@ -41,9 +40,6 @@ public class TaskManagementSystem {
                     viewStatistics();
                     break;
                 case 8:
-                    exportTasksToCSV();
-                    break;
-                case 9:
                     running = false;
                     System.out.println("\nThank you for using Task Management System!");
                     break;
@@ -54,9 +50,6 @@ public class TaskManagementSystem {
         scanner.close();
     }
 
-    /**
-     * Displays the main menu options
-     */
     private static void displayMenu() {
         System.out.println("========================================");
         System.out.println("1. Add New Task");
@@ -66,18 +59,14 @@ public class TaskManagementSystem {
         System.out.println("5. Delete Task");
         System.out.println("6. Search Tasks");
         System.out.println("7. View Statistics");
-        System.out.println("8. Export Tasks to CSV");
-        System.out.println("9. Exit");
+        System.out.println("8. Exit");
         System.out.println("========================================");
     }
 
-    /**
-     * Adds a new task to the system
-     */
     private static void addTask() {
         System.out.println("\n--- Add New Task ---");
-        
-        scanner.nextLine(); // Clear buffer
+
+        scanner.nextLine();
         System.out.print("Task Title: ");
         String title = scanner.nextLine();
 
@@ -85,32 +74,24 @@ public class TaskManagementSystem {
         String description = scanner.nextLine();
 
         System.out.print("Due Date (DD-MM-YYYY): ");
-        String dueDateStr = scanner.nextLine();
-        LocalDate dueDate = parseDate(dueDateStr);
+        LocalDate dueDate = parseDate(scanner.nextLine());
 
         System.out.println("\nPriority Levels:");
         System.out.println("1. HIGH");
         System.out.println("2. MEDIUM");
         System.out.println("3. LOW");
-        int priorityChoice = getIntInput("Select Priority: ");
-        Priority priority = Priority.fromInt(priorityChoice);
+        Priority priority = Priority.fromInt(getIntInput("Select Priority: "));
 
-        Task task = new Task(nextId++, title, description, dueDate, priority);
-        tasks.add(task);
-
+        tasks.add(new Task(nextId++, title, description, dueDate, priority));
         System.out.println("\nTask added successfully!\n");
     }
 
-    /**
-     * Displays all tasks in the system
-     */
     private static void viewAllTasks() {
         System.out.println("\n--- All Tasks ---");
         if (tasks.isEmpty()) {
             System.out.println("No tasks available.\n");
             return;
         }
-
         for (Task task : tasks) {
             System.out.println(task);
             System.out.println("----------------------------------------");
@@ -118,18 +99,13 @@ public class TaskManagementSystem {
         System.out.println();
     }
 
-    /**
-     * Views tasks filtered by priority level
-     */
     private static void viewTasksByPriority() {
         System.out.println("\n--- Filter by Priority ---");
         System.out.println("1. HIGH");
         System.out.println("2. MEDIUM");
         System.out.println("3. LOW");
-        int priorityChoice = getIntInput("Select Priority: ");
-        Priority priority = Priority.fromInt(priorityChoice);
+        Priority priority = Priority.fromInt(getIntInput("Select Priority: "));
 
-        System.out.println("\n--- " + priority + " Priority Tasks ---");
         boolean found = false;
         for (Task task : tasks) {
             if (task.getPriority() == priority) {
@@ -138,23 +114,15 @@ public class TaskManagementSystem {
                 found = true;
             }
         }
-
         if (!found) {
             System.out.println("No tasks found with " + priority + " priority.\n");
         }
-        System.out.println();
     }
 
-    /**
-     * Marks a task as complete
-     */
     private static void markTaskComplete() {
-        System.out.println("\n--- Mark Task Complete ---");
         viewAllTasks();
-        
-        int taskId = getIntInput("Enter Task ID to mark complete: ");
-        Task task = findTaskById(taskId);
-
+        int id = getIntInput("Enter Task ID to mark complete: ");
+        Task task = findTaskById(id);
         if (task != null) {
             task.markComplete();
             System.out.println("\nTask marked as complete!\n");
@@ -163,16 +131,10 @@ public class TaskManagementSystem {
         }
     }
 
-    /**
-     * Deletes a task from the system
-     */
     private static void deleteTask() {
-        System.out.println("\n--- Delete Task ---");
         viewAllTasks();
-        
-        int taskId = getIntInput("Enter Task ID to delete: ");
-        Task task = findTaskById(taskId);
-
+        int id = getIntInput("Enter Task ID to delete: ");
+        Task task = findTaskById(id);
         if (task != null) {
             tasks.remove(task);
             System.out.println("\nTask deleted successfully!\n");
@@ -181,16 +143,11 @@ public class TaskManagementSystem {
         }
     }
 
-    /**
-     * Searches tasks by keyword in title or description
-     */
     private static void searchTasks() {
-        System.out.println("\n--- Search Tasks ---");
-        scanner.nextLine(); // Clear buffer
-        System.out.print("Enter search keyword: ");
+        scanner.nextLine();
+        System.out.print("Enter keyword: ");
         String keyword = scanner.nextLine().toLowerCase();
 
-        System.out.println("\n--- Search Results ---");
         boolean found = false;
         for (Task task : tasks) {
             if (task.getTitle().toLowerCase().contains(keyword) ||
@@ -200,165 +157,58 @@ public class TaskManagementSystem {
                 found = true;
             }
         }
-
         if (!found) {
-            System.out.println("No tasks found matching '" + keyword + "'.\n");
+            System.out.println("No matching tasks found.\n");
         }
-        System.out.println();
     }
 
-    /**
-     * Displays task statistics
-     */
     private static void viewStatistics() {
-        System.out.println("\n--- Task Statistics ---");
-        
-        int total = tasks.size();
-        int completed = 0;
-        int pending = 0;
-        int overdue = 0;
-        int high = 0, medium = 0, low = 0;
-
+        int total = tasks.size(), completed = 0, overdue = 0;
         LocalDate today = LocalDate.now();
 
         for (Task task : tasks) {
-            if (task.isCompleted()) {
-                completed++;
-            } else {
-                pending++;
-                if (task.getDueDate().isBefore(today)) {
-                    overdue++;
-                }
-            }
-
-            switch (task.getPriority()) {
-                case HIGH:
-                    high++;
-                    break;
-                case MEDIUM:
-                    medium++;
-                    break;
-                case LOW:
-                    low++;
-                    break;
-            }
+            if (task.isCompleted()) completed++;
+            else if (task.getDueDate().isBefore(today)) overdue++;
         }
 
+        System.out.println("\n--- Statistics ---");
         System.out.println("Total Tasks: " + total);
         System.out.println("Completed: " + completed);
-        System.out.println("Pending: " + pending);
-        System.out.println("Overdue: " + overdue);
-        System.out.println("\nBy Priority:");
-        System.out.println("  HIGH: " + high);
-        System.out.println("  MEDIUM: " + medium);
-        System.out.println("  LOW: " + low);
-        System.out.println();
+        System.out.println("Pending: " + (total - completed));
+        System.out.println("Overdue: " + overdue + "\n");
     }
 
-    /**
-     * Exports all tasks to a CSV file
-     */
-    private static void exportTasksToCSV() {
-        System.out.println("\n--- Export Tasks to CSV ---");
-        
-        if (tasks.isEmpty()) {
-            System.out.println("No tasks to export.\n");
-            return;
-        }
-        
-        String filename = "tasks_export_" + LocalDate.now() + ".csv";
-        
-        try (PrintWriter writer = new PrintWriter(filename)) {
-            // Write CSV header
-            writer.println("ID,Title,Description,Due Date,Priority,Status,Created Date");
-            
-            // Write task data
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            for (Task task : tasks) {
-                String status = task.isCompleted() ? "COMPLETED" : "PENDING";
-                
-                // Escape commas and quotes in text fields
-                String title = escapeCSV(task.getTitle());
-                String description = escapeCSV(task.getDescription());
-                
-                writer.printf("\"%d\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
-                    task.getId(),
-                    title,
-                    description,
-                    task.getDueDate().format(formatter),
-                    task.getPriority(),
-                    status,
-                    task.getCreatedDate().format(formatter)
-                );
-            }
-            
-            System.out.println("\nTasks exported successfully!");
-            System.out.println("File: " + filename);
-            System.out.println("Total tasks exported: " + tasks.size() + "\n");
-            
-        } catch (Exception e) {
-            System.out.println("\nError exporting tasks: " + e.getMessage() + "\n");
-        }
-    }
-
-    /**
-     * Escapes special characters for CSV format
-     */
-    private static String escapeCSV(String value) {
-        if (value == null) return "";
-        // Replace quotes with double quotes
-        return value.replace("\"", "\"\"");
-    }
-
-    /**
-     * Finds a task by its ID
-     */
     private static Task findTaskById(int id) {
-        for (Task task : tasks) {
-            if (task.getId() == id) {
-                return task;
-            }
-        }
+        for (Task task : tasks)
+            if (task.getId() == id) return task;
         return null;
     }
 
-    /**
-     * Parses a date string to LocalDate
-     */
-    private static LocalDate parseDate(String dateStr) {
+    private static LocalDate parseDate(String date) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            return LocalDate.parse(dateStr, formatter);
+            return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         } catch (Exception e) {
             System.out.println("Invalid date format. Using today's date.");
             return LocalDate.now();
         }
     }
 
-    /**
-     * Gets integer input from user with validation
-     */
-    private static int getIntInput(String prompt) {
-        System.out.print(prompt);
+    private static int getIntInput(String msg) {
+        System.out.print(msg);
         while (!scanner.hasNextInt()) {
-            System.out.print("Invalid input. " + prompt);
             scanner.next();
+            System.out.print("Invalid input. " + msg);
         }
         return scanner.nextInt();
     }
 }
 
-/**
- * Task class representing a single task
- */
 class Task {
     private int id;
-    private String title;
-    private String description;
-    private LocalDate dueDate;
+    private String title, description;
+    private LocalDate dueDate, createdDate;
     private Priority priority;
     private boolean completed;
-    private LocalDate createdDate;
 
     public Task(int id, String title, String description, LocalDate dueDate, Priority priority) {
         this.id = id;
@@ -366,57 +216,33 @@ class Task {
         this.description = description;
         this.dueDate = dueDate;
         this.priority = priority;
-        this.completed = false;
         this.createdDate = LocalDate.now();
     }
 
-    public void markComplete() {
-        this.completed = true;
-    }
-
-    // Getters
+    public void markComplete() { completed = true; }
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public LocalDate getDueDate() { return dueDate; }
     public Priority getPriority() { return priority; }
     public boolean isCompleted() { return completed; }
-    public LocalDate getCreatedDate() { return createdDate; }
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String status = completed ? "[COMPLETED]" : "[PENDING]";
-        
         return String.format(
-            "ID: %d\n" +
-            "Title: %s\n" +
-            "Description: %s\n" +
-            "Due Date: %s\n" +
-            "Priority: %s\n" +
-            "Status: %s\n" +
-            "Created: %s",
-            id, title, description, 
-            dueDate.format(formatter), 
-            priority, 
-            status,
-            createdDate.format(formatter)
+            "ID: %d\nTitle: %s\nDescription: %s\nDue: %s\nPriority: %s\nStatus: %s\nCreated: %s",
+            id, title, description,
+            dueDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            priority,
+            completed ? "COMPLETED" : "PENDING",
+            createdDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         );
     }
 }
 
-/**
- * Enum for task priority levels
- */
 enum Priority {
     HIGH, MEDIUM, LOW;
-
-    public static Priority fromInt(int choice) {
-        switch (choice) {
-            case 1: return HIGH;
-            case 2: return MEDIUM;
-            case 3: return LOW;
-            default: return MEDIUM;
-        }
+    public static Priority fromInt(int i) {
+        return i == 1 ? HIGH : i == 3 ? LOW : MEDIUM;
     }
 }

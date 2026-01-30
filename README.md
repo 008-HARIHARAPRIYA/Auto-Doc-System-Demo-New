@@ -1,107 +1,93 @@
 # Task Management System
 
-This is a simple command-line interface (CLI) application developed in Java for managing tasks. It allows users to add new tasks, view existing ones, filter by priority, mark tasks as complete, delete tasks, search for tasks, and view overall statistics.
+This project is a console-based Task Management System developed in Java. It allows users to manage their tasks through a simple interactive menu, providing functionalities such as adding new tasks, viewing, updating, deleting, searching, and exporting them.
 
 ## Features
 
-Based on the provided code, the Task Management System supports the following functionalities:
+Based on the provided code, the Task Management System offers the following features:
 
-*   **Add New Task:** Create a task by providing a title, description, due date (DD-MM-YYYY format), and priority level (HIGH, MEDIUM, LOW).
-*   **View All Tasks:** Display a list of all tasks, showing their ID, title, description, due date, priority, status (COMPLETED/PENDING), and creation date.
+*   **Add New Task:** Create a new task by providing a title, description, due date (in `DD-MM-YYYY` format), and selecting a priority level (HIGH, MEDIUM, LOW).
+*   **View All Tasks:** Display a list of all tasks currently in the system, showing their ID, title, description, due date, priority, status (COMPLETED/PENDING), and creation date.
 *   **View Tasks by Priority:** Filter and display tasks based on a selected priority level (HIGH, MEDIUM, or LOW).
-*   **Mark Task as Complete:** Change the status of a specific task to "COMPLETED" using its ID.
-*   **Delete Task:** Remove a task from the system using its ID.
-*   **Search Tasks:** Find tasks whose title or description contains a specified keyword (case-insensitive).
-*   **View Statistics:** Display an overview of task metrics, including total tasks, completed tasks, pending tasks, and overdue tasks.
-*   **Interactive Menu:** A user-friendly menu guides the interaction with the system.
+*   **Mark Task as Complete:** Change the status of an existing task to 'COMPLETED' by entering its ID.
+*   **Delete Task:** Remove a task from the system permanently by entering its ID.
+*   **Search Tasks:** Find tasks by entering a keyword that matches either the task's title or description (case-insensitive).
+*   **View Statistics:** See an overview of tasks, including the total number of tasks, completed tasks, pending tasks, overdue tasks, and counts for each priority level (HIGH, MEDIUM, LOW). Overdue tasks are determined relative to the current date.
+*   **Export Tasks to CSV:** Generate a CSV file containing all tasks with their details. The file is named `tasks_export_YYYY-MM-DD.csv` and includes headers: `ID,Title,Description,Due Date,Priority,Status,Created Date`. Titles and descriptions are escaped for proper CSV formatting.
+*   **Exit:** Terminate the application.
 
 ## Technology Stack
 
 *   **Language:** Java
-    *   `java.time` package for handling dates (LocalDate, DateTimeFormatter).
-    *   `java.util` package for collections (ArrayList, List) and input processing (Scanner).
+*   **Core Libraries:**
+    *   `java.time`: For date handling (`LocalDate`, `DateTimeFormatter`).
+    *   `java.util`: For data structures (`ArrayList`, `Scanner`).
+    *   `java.io`: For file output (`PrintWriter`).
 
 ## File Structure Overview
 
-The project consists of a single Java source file:
+This project consists of a single Java file:
 
 ```
 .
 └── TaskManagementSystem.java
 ```
 
-This file contains:
-*   `TaskManagementSystem` class: The main application logic, including the `main` method, menu display, task operations, and utility functions.
-*   `Task` class: A data model representing a single task, holding its attributes and methods to manage its state.
-*   `Priority` enum: Defines the possible priority levels for tasks.
+## How to Run/Compile
 
-## How to Compile and Run
+To compile and run this Java console application, follow these steps:
 
-To compile and run this Java application, you will need a Java Development Kit (JDK) installed on your system.
-
-1.  **Save the code:** Save the provided Java code into a file named `TaskManagementSystem.java`.
-
-2.  **Compile:** Open a terminal or command prompt, navigate to the directory where you saved the file, and compile the Java code:
+1.  **Save the code:** Save the provided Java code as `TaskManagementSystem.java` in a directory of your choice.
+2.  **Open Terminal/Command Prompt:** Navigate to the directory where you saved the file.
+3.  **Compile:** Use the Java compiler (`javac`) to compile the source file:
     ```bash
     javac TaskManagementSystem.java
     ```
-
-3.  **Run:** After successful compilation, run the application using:
+    This will generate `TaskManagementSystem.class`, `Task.class`, and `Priority.class` files in the same directory.
+4.  **Run:** Execute the compiled Java program using the Java Virtual Machine (`java`):
     ```bash
     java TaskManagementSystem
     ```
-
-The application will then start in your terminal, displaying the main menu.
+5.  **Interact:** The application will start and display a menu in the console. Follow the on-screen prompts to interact with the Task Management System.
 
 ## Code Highlights and Important Components
 
 ### `TaskManagementSystem.java`
+This is the main class that orchestrates the entire application.
 
-This file encapsulates the entire application logic.
-
-*   **`main` method:** The entry point of the application, responsible for the main loop, displaying the menu, and handling user input to call appropriate task management functions.
-*   **`tasks` (static `List<Task>`):** An `ArrayList` used to store all `Task` objects in memory.
-*   **`scanner` (static `Scanner`):** Manages user input from the console.
-*   **`nextId` (static `int`):** Automatically assigns a unique ID to each new task.
-*   **`addTask()`:** Prompts the user for task details (title, description, due date, priority) and creates a new `Task` instance.
-*   **`viewAllTasks()`:** Iterates through the `tasks` list and prints the `toString()` representation of each task.
-*   **`viewTasksByPriority()`:** Filters tasks based on user-selected priority and displays them.
-*   **`markTaskComplete()`:** Locates a task by ID and sets its `completed` status to `true`.
-*   **`deleteTask()`:** Locates a task by ID and removes it from the `tasks` list.
-*   **`searchTasks()`:** Searches for tasks where the title or description contains a user-specified keyword.
-*   **`viewStatistics()`:** Calculates and presents the total, completed, pending, and overdue task counts.
-*   **Helper methods:**
-    *   `findTaskById(int id)`: Searches the `tasks` list for a task matching the given ID.
-    *   `parseDate(String date)`: Parses a date string in "DD-MM-YYYY" format into a `LocalDate` object, handling invalid formats by defaulting to the current date.
-    *   `getIntInput(String msg)`: Utility for robust integer input, prompting the user until valid integer input is received.
+*   **`main` method:** The entry point of the program, it initializes the system, displays the interactive menu, and handles user input to navigate through different task management operations.
+*   **`tasks` (Static `List<Task>`):** An `ArrayList` used to store all `Task` objects in memory. Tasks are not persisted beyond the application's runtime unless exported.
+*   **`scanner` (Static `Scanner`):** Used for reading user input from the console.
+*   **Menu-driven interface:** The `displayMenu()` method presents options, and a `switch` statement in `main` dispatches to specific methods based on user choice.
+*   **Task Management Methods:** Contains methods for each menu option (e.g., `addTask()`, `viewAllTasks()`, `markTaskComplete()`, `deleteTask()`, `searchTasks()`, `viewStatistics()`, `exportTasksToCSV()`).
+*   **Helper Methods:** Includes utility methods like `findTaskById()`, `parseDate()` for date string conversion, `getIntInput()` for robust integer input, and `escapeCSV()` for preparing strings for CSV output.
+*   **CSV Export Logic:** The `exportTasksToCSV()` method demonstrates writing structured data to a file in CSV format, including a header row and basic handling for special characters within data fields.
 
 ### `Task` Class
-
-The `Task` class is a data model that represents a single task within the system.
+This class represents a single task entity within the system.
 
 *   **Attributes:**
     *   `id` (int): Unique identifier for the task.
-    *   `title` (String): Short title of the task.
-    *   `description` (String): Detailed description of the task.
+    *   `title` (String): The name of the task.
+    *   `description` (String): Detailed explanation of the task.
     *   `dueDate` (LocalDate): The date by which the task should be completed.
-    *   `createdDate` (LocalDate): The date when the task was created (automatically set to `LocalDate.now()` upon creation).
-    *   `priority` (Priority enum): The priority level of the task.
-    *   `completed` (boolean): Flag indicating whether the task is complete (default `false`).
-*   **Constructor:** Initializes a new task with the provided details and sets `createdDate` to the current date.
-*   **`markComplete()`:** A simple setter method to change the `completed` status to `true`.
-*   **Getters:** Provides access to all private attributes of the task.
-*   **`toString()`:** Overrides the default `Object.toString()` method to provide a formatted, human-readable string representation of the task's details.
+    *   `priority` (Priority enum): The urgency level of the task.
+    *   `completed` (boolean): Indicates whether the task is finished or not.
+    *   `createdDate` (LocalDate): The date when the task was created.
+*   **Constructor:** Initializes a new task with its ID, title, description, due date, and priority. Sets `completed` to `false` and `createdDate` to the current date.
+*   **`markComplete()` method:** Changes the task's `completed` status to `true`.
+*   **Getters:** Provides methods to access all task attributes.
+*   **`toString()` method:** Overridden to provide a formatted string representation of the task, including its ID, title, description, formatted due date, priority, status, and creation date.
 
 ### `Priority` Enum
-
-The `Priority` enum defines the available priority levels for tasks.
+This enum defines the possible priority levels for a task.
 
 *   **Levels:** `HIGH`, `MEDIUM`, `LOW`.
-*   **`fromInt(int i)`:** A static factory method that converts an integer input (1 for HIGH, 2 for MEDIUM, 3 for LOW) into the corresponding `Priority` enum value. Defaults to `MEDIUM` if the input is not 1 or 3.
+*   **`fromInt()` method:** A static helper method to convert an integer input (1 for HIGH, 2 for MEDIUM, 3 for LOW) into the corresponding `Priority` enum value. Defaults to `MEDIUM` if an invalid choice is provided.
 
-## Usage Example
+## Usage Examples
 
-After running the `TaskManagementSystem`, you will see a menu similar to this:
+Upon running the application, you will be presented with a menu:
 
 ```
 ========================================
@@ -116,21 +102,22 @@ After running the `TaskManagementSystem`, you will see a menu similar to this:
 5. Delete Task
 6. Search Tasks
 7. View Statistics
-8. Exit
+8. Export Tasks to CSV
+9. Exit
 ========================================
 Enter your choice:
 ```
 
-Here's an example interaction flow:
+You can interact by entering the number corresponding to your desired action:
 
-1.  **Add a new task:**
+1.  **To add a task:** Enter `1`. You will then be prompted for the task's title, description, due date (e.g., `25-12-2023`), and priority.
     ```
     Enter your choice: 1
 
     --- Add New Task ---
-    Task Title: Buy groceries
-    Task Description: Milk, eggs, bread, cheese
-    Due Date (DD-MM-YYYY): 15-03-2024
+    Task Title: Plan Holiday
+    Task Description: Research destinations and book flights.
+    Due Date (DD-MM-YYYY): 15-11-2023
 
     Priority Levels:
     1. HIGH
@@ -140,88 +127,33 @@ Here's an example interaction flow:
 
     Task added successfully!
     ```
-
-2.  **Add another task:**
-    ```
-    Enter your choice: 1
-
-    --- Add New Task ---
-    Task Title: Prepare presentation
-    Task Description: Review slides for Q2
-    Due Date (DD-MM-YYYY): 20-03-2024
-
-    Priority Levels:
-    1. HIGH
-    2. MEDIUM
-    3. LOW
-    Select Priority: 2
-
-    Task added successfully!
-    ```
-
-3.  **View all tasks:**
+2.  **To view all tasks:** Enter `2`.
     ```
     Enter your choice: 2
 
     --- All Tasks ---
     ID: 1
-    Title: Buy groceries
-    Description: Milk, eggs, bread, cheese
-    Due: 15-03-2024
+    Title: Plan Holiday
+    Description: Research destinations and book flights.
+    Due Date: 15-11-2023
     Priority: HIGH
-    Status: PENDING
-    Created: 10-03-2024
-    ----------------------------------------
-    ID: 2
-    Title: Prepare presentation
-    Description: Review slides for Q2
-    Due: 20-03-2024
-    Priority: MEDIUM
-    Status: PENDING
-    Created: 10-03-2024
+    Status: [PENDING]
+    Created: 01-11-2023
     ----------------------------------------
     ```
-
-4.  **Mark "Buy groceries" as complete (Task ID 1):**
-    ```
-    Enter your choice: 4
-
-    --- All Tasks ---
-    ID: 1
-    Title: Buy groceries
-    Description: Milk, eggs, bread, cheese
-    Due: 15-03-2024
-    Priority: HIGH
-    Status: PENDING
-    Created: 10-03-2024
-    ----------------------------------------
-    ID: 2
-    Title: Prepare presentation
-    Description: Review slides for Q2
-    Due: 20-03-2024
-    Priority: MEDIUM
-    Status: PENDING
-    Created: 10-03-2024
-    ----------------------------------------
-    Enter Task ID to mark complete: 1
-
-    Task marked as complete!
-    ```
-
-5.  **View statistics:**
-    ```
-    Enter your choice: 7
-
-    --- Statistics ---
-    Total Tasks: 2
-    Completed: 1
-    Pending: 1
-    Overdue: 0
-    ```
-
-6.  **Exit the application:**
+3.  **To export tasks to CSV:** Enter `8`. A file named `tasks_export_YYYY-MM-DD.csv` will be created in the same directory as the executable, containing all current tasks.
     ```
     Enter your choice: 8
 
-    Thank you for using Task Management System!
+    --- Export Tasks to CSV ---
+
+    Tasks exported successfully!
+    File: tasks_export_2023-11-01.csv
+    Total tasks exported: 1
     ```
+    The content of `tasks_export_2023-11-01.csv` would look similar to:
+    ```csv
+    ID,Title,Description,Due Date,Priority,Status,Created Date
+    "1","Plan Holiday","Research destinations and book flights.","15-11-2023","HIGH","PENDING","01-11-2023"
+    ```
+4.  **To exit the system:** Enter `9`.
